@@ -1,0 +1,106 @@
+{% extends 'mon_app/base.html' %}
+
+{% block contenu %}
+<div class="container mt-4">
+    <h2>Simulateur</h2>
+    
+    <form id="titre-form">
+        <div class="mb-3">
+            <label for="pays-select" class="form-label">Pays :</label>
+            <select class="form-select" id="pays-select" name="pays">
+                <option value="">Sélectionnez un pays</option>
+                {% for pays in pays_list %}
+                    <option value="{{ pays.nom }}">{{ pays.get_nom_display }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="type-select" class="form-label">Type de titre :</label>
+            <select class="form-select" id="type-select" name="type_titre" disabled>
+                <option value="">Sélectionnez d'abord un pays</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="isin-select" class="form-label">ISIN :</label>
+            <select class="form-select" id="isin-select" name="isin" disabled>
+                <option value="">Sélectionnez d'abord un type de titre</option>
+            </select>
+        </div>
+
+        <button type="button" class="btn btn-primary" disabled id="submit-btn">
+            Voir les détails
+        </button>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paysSelect = document.getElementById('pays-select');
+    const typeSelect = document.getElementById('type-select');
+    const isinSelect = document.getElementById('isin-select');
+    const submitBtn = document.getElementById('submit-btn');
+
+    paysSelect.addEventListener('change', function() {
+        const paysCode = this.value;
+        
+        typeSelect.innerHTML = '<option value="">Chargement...</option>';
+        typeSelect.disabled = true;
+        isinSelect.innerHTML = '<option value="">Sélectionnez un type de titre</option>';
+        isinSelect.disabled = true;
+        submitBtn.disabled = true;
+
+        if (paysCode) {
+            fetch(`/get-titres-data/?pays=${encodeURIComponent(paysCode)}`)
+                .then(response => response.json())
+                .then(data => {
+                    typeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
+                    data.types_titres.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type;
+                        option.textContent = type;
+                        typeSelect.appendChild(option);
+                    });
+                    typeSelect.disabled = false;
+                });
+        }
+    });
+
+    typeSelect.addEventListener('change', function() {
+        const type = this.value;
+        const paysCode = paysSelect.value;
+        
+        isinSelect.innerHTML = '<option value="">Chargement...</option>';
+        isinSelect.disabled = true;
+        submitBtn.disabled = true;
+
+        if (type && paysCode) {
+            fetch(`/get-titres-data/?pays=${encodeURIComponent(paysCode)}&type_titre=${encodeURIComponent(type)}`)
+                .then(response => response.json())
+                .then(data => {
+                    isinSelect.innerHTML = '<option value="">Sélectionnez un ISIN</option>';
+                    data.titres.forEach(titre => {
+                        const option = document.createElement('option');
+                        option.value = titre.isin;
+                        option.textContent = titre.isin;  // Afficher seulement l'ISIN
+                        isinSelect.appendChild(option);
+                    });
+                    isinSelect.disabled = false;
+                });
+        }
+    });
+
+    isinSelect.addEventListener('change', function() {
+        submitBtn.disabled = !this.value;
+    });
+
+    submitBtn.addEventListener('click', function() {
+        const isin = isinSelect.value;
+        if (isin) {
+            window.location.href = `/titre/${isin}/`;
+        }
+    });
+});
+</script>
+{% endblock %}

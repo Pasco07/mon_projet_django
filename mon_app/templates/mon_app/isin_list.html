@@ -1,0 +1,31 @@
+{% extends 'mon_app/base.html' %}
+
+{% block titre %}Liste des ISIN pour {{ pays.get_nom_display }}{% endblock %}
+
+{% block contenu %}
+    <h1>Liste des ISIN pour {{ pays.get_nom_display }}</h1>
+
+    <!-- Afficher un message si aucun titre n'est trouvé -->
+    {% if not titres %}
+        <p class="alert alert-info">Liste vide pour le moment.</p>
+    {% else %}
+        <form method="get" action="{% url 'isin_list' %}">
+            <input type="hidden" name="pays_code" value="{{ pays.nom }}">
+            <input type="hidden" name="type_titre" value="{{ type_titre_selectionne }}">
+            
+            <div class="mb-3">
+                <label for="isin" class="form-label">Choisissez un ISIN :</label>
+                <select class="form-select" id="isin" name="isin">
+                    <option value="">Sélectionnez un ISIN</option>
+                    {% for titre in titres %}
+                        <option value="{{ titre.isin }}">{{ titre.isin }} ({{ titre.type_titre }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Valider</button>
+        </form>
+    {% endif %}
+
+    <!-- Lien pour revenir à la sélection -->
+    <a href="{% url 'select_pays' %}" class="btn btn-secondary mt-3">Retour à la sélection</a>
+{% endblock %}

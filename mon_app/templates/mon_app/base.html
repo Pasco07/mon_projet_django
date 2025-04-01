@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titre %}Mon Site{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'mon_app/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'mon_app/css/bootstrap-icons.css' %}">
+    <!-- CSS personnalisé -->
+    <link rel="stylesheet" href="{% static 'mon_app/css/styles.css' %}">
+    
+    
+</head>
+<body>
+    
+    <header>
+        
+        <h1>Mon Site</h1>
+        <nav>
+            <a href="{% url 'select_pays' %}">Accueil</a>
+            <!-- Ajoutez d'autres liens ici -->
+        </nav>
+    </header>
+
+    <main>
+        {% block contenu %}
+        <!-- Le contenu spécifique à chaque page sera inséré ici -->
+        {% endblock %}
+    </main>
+
+    <!-- Bootstrap JS et dépendances -->
+    <script src="{% static 'mon_app/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- JS personnalisé -->
+    <script src="{% static 'mon_app/js/scripts.js' %}"></script>
+</body>
+</html>
