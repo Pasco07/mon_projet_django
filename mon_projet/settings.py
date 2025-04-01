@@ -123,12 +123,7 @@ if 'RENDER' in os.environ:
     # Forcer le moteur PostgreSQL explicitement
     DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
 
-# Surcharge PROD (PostgreSQL sur Render)
-if 'RENDER' in os.environ or 'DATABASE_URL' in os.environ:
-    DATABASES['default'] = dj_database_url.config(
-        conn_max_age=600,
-        ssl_require=True
-    )
+
 
 
 # Password validation
