@@ -116,16 +116,11 @@ DATABASES = {
 # Surcharge PROD (PostgreSQL sur Render)
 if 'RENDER' in os.environ:
     DATABASES['default'] = dj_database_url.config(
-        conn_max_age=600,
-        conn_max_requests=0,
+        default=config('DATABASE_URL'),  # Ajout important
         ssl_require=True
     )
-    # Forcer le moteur PostgreSQL explicitement
+    # Forcer le moteur PostgreSQL
     DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
-
-
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
