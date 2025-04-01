@@ -51,11 +51,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     
 ]
 
 ROOT_URLCONF = 'mon_projet.urls'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'  
 
 
 TEMPLATES = [
@@ -96,11 +97,40 @@ WSGI_APPLICATION = 'mon_projet.wsgi.application'
 #     }
 # }
 
-
-
+# Configuration DEV (MySQL local)
 DATABASES = {
-    'default': dj_database_url.config('DATABASE_URL')
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mtp',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        }
+    }
 }
+
+# Surcharge PROD (PostgreSQL sur Render)
+if 'RENDER' in os.environ:
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=600,
+        conn_max_requests=0,
+        ssl_require=True
+    )
+    # Forcer le moteur PostgreSQL explicitement
+    DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
+
+# Surcharge PROD (PostgreSQL sur Render)
+if 'RENDER' in os.environ or 'DATABASE_URL' in os.environ:
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -135,13 +165,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join (BASE_DIR , 'staticfiles')
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'mon_app/static')]
 
 # Dossiers supplémentaires pour les fichiers statiques
-STATICFILES_DIRS = [
-    BASE_DIR / 'mon_app/static',
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'mon_app/static',
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -163,3 +194,12 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 86400.0,  # Tous les jours
     },
 }
+
+
+# Configuration Celery
+if 'RENDER' in os.environ:
+    CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+else:
+    CELERY_BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
