@@ -35,6 +35,19 @@ ALLOWED_HOSTS = [
     '.onrender.com'  # Permet tous les sous-domaines Render
 ]
 
+# Configuration CSRF pour HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://application-django.onrender.com',
+    'https://*.onrender.com'
+]
+
+# Configuration de sécurité pour la production
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 
 # Application definition
 
