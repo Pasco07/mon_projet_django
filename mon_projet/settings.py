@@ -102,7 +102,7 @@ WSGI_APPLICATION = 'mon_projet.wsgi.application'
 # }
 
 # Configuration DEV (MySQL local)
-D# Simplifiez la configuration comme ceci :
+# Simplifiez la configuration comme ceci :
 DATABASES = {
     'default': dj_database_url.config(
         default=config('DATABASE_URL', 'mysql://root:@localhost:3306/mtp'),
