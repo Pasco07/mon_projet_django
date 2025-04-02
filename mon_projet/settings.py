@@ -28,8 +28,12 @@ SECRET_KEY = config ('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "https://application-django.onrender.com"]
-
+ALLOWED_HOSTS = [
+    '127.0.0.1', 
+    'localhost', 
+    'application-django.onrender.com',  # Sans https://
+    '.onrender.com'  # Permet tous les sous-domaines de render.com
+]
 
 # Application definition
 
