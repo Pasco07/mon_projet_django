@@ -28,7 +28,7 @@ SECRET_KEY = config ('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "https://application-django.onrender.com"]
 
 
 # Application definition
@@ -98,32 +98,21 @@ WSGI_APPLICATION = 'mon_projet.wsgi.application'
 # }
 
 # Configuration DEV (MySQL local)
+D# Simplifiez la configuration comme ceci :
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mtp',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'charset': 'utf8mb4',
-        }
-    }
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL', 'mysql://root:@localhost:3306/mtp'),
+        engine='django.db.backends.postgresql' if 'RENDER' in os.environ 
+               else 'django.db.backends.mysql'
+    )
 }
 
-
-# Surcharge PROD (PostgreSQL sur Render)
-if 'RENDER' in os.environ:
-    DATABASES['default'] = dj_database_url.config(
-        default=config('DATABASE_URL'),  # Ajout important
-        ssl_require=True
-    )   
-    # Forcer le moteur PostgreSQL
-    DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
-
-
+# Et ajoutez cette option pour MySQL :
+if 'RENDER' not in os.environ:
+    DATABASES['default']['OPTIONS'] = {
+        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        'charset': 'utf8mb4',
+    }
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
