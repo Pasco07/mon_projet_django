@@ -98,32 +98,18 @@ WSGI_APPLICATION = 'mon_projet.wsgi.application'
 # }
 
 # Configuration DEV (MySQL local)
+# settings.py
+import os
+import dj_database_url
+from decouple import config
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mtp',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'dpg-cvlt3n6mcj7s73e9muug-a.oregon-postgres.render.com',
-        'PORT': '5432',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'charset': 'utf8mb4',
-        }
-    }
-}
-
-
-# Surcharge PROD (PostgreSQL sur Render)
-if 'RENDER' in os.environ:
-    DATABASES['default'] = dj_database_url.config(
-        default=config('DATABASE_URL'),  # Ajout important
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL', 'postgresql://mtp_user:password@dpg-cvlt3n6mcj7s73e9muug-a.oregon-postgres.render.com/mtp'),
+        conn_max_age=600,
         ssl_require=True
-    )   
-    # Forcer le moteur PostgreSQL
-    DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
-
-
+    )
+}
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
